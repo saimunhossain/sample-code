@@ -138,35 +138,35 @@ class ProductService
         try
         {
 
-            $storeProduct = Product::findOrFail($id);
-            $storeProduct->update([
-                'title' => $request->title,
-                'slug' => \Str::slug($request->title).'-'.\Str::random(6),
-                'price' => $request->price,
-                'stock' => $request->stock,
-                'qty' => $request->qty,
-                'total_page_number' => $request->total_page_number,
-                'description' => $request->description,
-                'best_for_age' => $request->best_for_age,
-                'cover_type' => $request->cover_type,
-                'shipping_day_from' => $request->shipping_day_from,
-                'shipping_day_to' => $request->shipping_day_to
+            $updateProduct = Product::findOrFail($id);
+            $updateProduct->update([
+                'title' => $request->title ?? $updateProduct->title,
+                'slug' => \Str::slug($request->title).'-'.\Str::random(6) ?? $updateProduct->slug,
+                'price' => $request->price ?? $updateProduct->price,
+                'stock' => $request->stock ?? $updateProduct->stock,
+                'qty' => $request->qty ?? $updateProduct->qty,
+                'total_page_number' => $request->total_page_number ?? $updateProduct->total_page_number,
+                'description' => $request->description ?? $updateProduct->description,
+                'best_for_age' => $request->best_for_age ?? $updateProduct->best_for_age,
+                'cover_type' => $request->cover_type ?? $updateProduct->cover_type,
+                'shipping_day_from' => $request->shipping_day_from ?? $updateProduct->shipping_day_from,
+                'shipping_day_to' => $request->shipping_day_to ?? $updateProduct->shipping_day_to
             ]);
 
-            $storeProduct->families()->sync($request->family);
-            $storeProduct->festivals()->sync($request->festival);
-            $storeProduct->others()->sync($request->others);
+            $updateProduct->families()->sync($request->family);
+            $updateProduct->festivals()->sync($request->festival);
+            $updateProduct->others()->sync($request->others);
 
             if($request->has('personalization_label')) {
-                $this->personalizationInsert($request, $storeProduct->id);
+                $this->personalizationInsert($request, $id);
             }
 
             if($request->hasfile('image_url')) {
-                $this->uploadFeaturedImage($request, $storeProduct->id);
+                $this->uploadFeaturedImage($request, $id);
             }
 
             if($request->hasfile('imageFile')) {
-                $this->bulkImageUpload($request, $storeProduct->id);
+                $this->bulkImageUpload($request, $id);
             }
             DB::commit();
         return redirect()->route('product')->with('success', 'Book has been updated!');
